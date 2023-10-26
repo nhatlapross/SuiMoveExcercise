@@ -1,4 +1,11 @@
 module lesson5::discount_coupon {
+     use sui::coin::{Self, CoinMetadata, TreasuryCap, Coin};
+    use std::option;
+    use sui::url;
+    use sui::tx_context::{Self,TxContext};
+    use sui::transfer;
+    use std::string;
+    use sui::event;
     struct DiscountCoupon has key {
         id: UID,
         owner: address,
