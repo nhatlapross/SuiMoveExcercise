@@ -1,6 +1,5 @@
 module game_hero::hero {
     use sui::coin::{Self, Coin};
-    use sui::event;
     use sui::object::{Self,ID,UID};
     use sui::math;
     use sui::sui::SUI;
@@ -127,9 +126,12 @@ module game_hero::hero {
         if(option::is_some(&hero.sword)){
             level_up_sword(option::borrow_mut(&mut hero.sword),1);
         };
+        
         if(option::is_some(&hero.armor)){
             level_up_armor(option::borrow_mut(&mut hero.armor),1);
         };
+
+        object::delete(monter_id);
 
     }
 
@@ -214,12 +216,9 @@ module game_hero::hero {
         }
     }
 
-    public fun create_armor(game: &GameInfo, payment: Coin<SUI>, ctx: &mut TxContext): Armor {
+    public fun create_armor(game: &GameInfo, amount: u64, ctx: &mut TxContext): Armor {
         // Create a sword, streight depends on payment amount
-        let value = coin::value(&payment);
-        assert!(value >= MIN_ARMOR_COST, EINSUFFICIENT_FUNDS);
-        transfer::public_transfer(payment,game.admin);
-        let guard = (value - MIN_ARMOR_COST) / MIN_ARMOR_COST;
+        let guard = amount;
         Armor {
             id: object::new(ctx),
             guard: math::min(guard, MAX_ARMOR),
@@ -231,7 +230,7 @@ module game_hero::hero {
         game: &GameInfo, payment: Coin<SUI>, ctx: &mut TxContext
     ) {
         // call function create_armor
-        let armor = create_armor(game, payment, ctx);
+        let armor = create_armor(game, 10, ctx);
         // call function create_sword
         let sword = create_sword(game, payment, ctx);
         // call function create_hero
